@@ -140,13 +140,13 @@ export default function Dashboard() {
   const [data, setData] = useState<ApiResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [countdown, setCountdown] = useState(POLL_INTERVAL / 1000);
 
   const fetchData = useCallback(async () => {
     try {
       const res = await fetch("/api/usage");
       const json = await res.json();
       if (json.error) {
-        // Only show error if we have no data yet; otherwise keep stale data
         if (!data) setError(json.error);
       } else {
         setData(json);
@@ -156,12 +156,19 @@ export default function Dashboard() {
     } catch (e) {
       if (!data) setError(e instanceof Error ? e.message : "Failed to fetch");
     }
+    setCountdown(POLL_INTERVAL / 1000);
   }, [data]);
 
   useEffect(() => {
     fetchData();
-    const interval = setInterval(fetchData, POLL_INTERVAL);
-    return () => clearInterval(interval);
+    const pollInterval = setInterval(fetchData, POLL_INTERVAL);
+    const tickInterval = setInterval(() => {
+      setCountdown((c) => Math.max(0, c - 1));
+    }, 1000);
+    return () => {
+      clearInterval(pollInterval);
+      clearInterval(tickInterval);
+    };
   }, [fetchData]);
 
   if (error) return <ErrorState message={error} />;
@@ -222,7 +229,9 @@ export default function Dashboard() {
               <span className="text-claude-text-muted">
                 {rateLimits.rate_limit_tier.replace("default_", "").replace(/_/g, " ")}
               </span>
-              <span className="text-claude-text-dim ml-1">· 30s poll</span>
+              <span className="text-claude-text-dim ml-1">
+                · next update in <span className="font-mono tabular-nums text-claude-text-muted">{countdown}s</span>
+              </span>
             </p>
           </div>
         </div>
