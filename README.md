@@ -13,20 +13,30 @@ npm install
 # 2. Copy the env template
 cp .env.example .env
 
-# 3. Get your session cookie:
-#    - Open claude.ai in Chrome
-#    - DevTools (F12) → Application → Cookies → claude.ai
-#    - Copy the full "sessionKey" value (starts with sk-ant-sid01-)
-#    - Paste in .env as: CLAUDE_SESSION_COOKIE="sessionKey=sk-ant-sid01-..."
-
-# 4. Your org ID is already in the template (from our reverse-engineering session)
+# 3. Your org ID is already in the template
 #    If it changes, find it in any claude.ai network request
 
-# 5. Run it
+# 4. Run it (auto-refreshes session cookie from Chrome)
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000)
+Open [http://localhost:10420](http://localhost:10420)
+
+## Auto Cookie Refresh (macOS + Chrome)
+
+The session cookie is refreshed automatically every time you run `npm run dev`. The `predev` script reads the `sessionKey` cookie directly from Chrome's local cookie database — no manual copy-pasting needed.
+
+**How it works:**
+1. Copies Chrome's SQLite cookie DB to avoid lock conflicts
+2. Decrypts the cookie using macOS Keychain + AES-128-CBC
+3. Updates `.env` with the fresh `sessionKey`
+
+You can also run it manually:
+```bash
+npm run refresh-cookie
+```
+
+> Requires being logged in to claude.ai in Chrome. Use `--profile "Profile 1"` if your Chrome profile isn't the default.
 
 ## API Endpoints Discovered
 
