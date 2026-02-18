@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   formatTimeUntilReset,
   formatResetDate,
@@ -141,25 +141,27 @@ export default function Dashboard() {
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [countdown, setCountdown] = useState(POLL_INTERVAL / 1000);
-
-  const fetchData = useCallback(async () => {
-    try {
-      const res = await fetch("/api/usage");
-      const json = await res.json();
-      if (json.error) {
-        if (!data) setError(json.error);
-      } else {
-        setData(json);
-        setError(null);
-        setLastUpdated(new Date());
-      }
-    } catch (e) {
-      if (!data) setError(e instanceof Error ? e.message : "Failed to fetch");
-    }
-    setCountdown(POLL_INTERVAL / 1000);
-  }, [data]);
+  const hasData = useRef(false);
 
   useEffect(() => {
+    async function fetchData() {
+      try {
+        const res = await fetch("/api/usage");
+        const json = await res.json();
+        if (json.error) {
+          if (!hasData.current) setError(json.error);
+        } else {
+          setData(json);
+          setError(null);
+          setLastUpdated(new Date());
+          hasData.current = true;
+        }
+      } catch (e) {
+        if (!hasData.current) setError(e instanceof Error ? e.message : "Failed to fetch");
+      }
+      setCountdown(POLL_INTERVAL / 1000);
+    }
+
     fetchData();
     const pollInterval = setInterval(fetchData, POLL_INTERVAL);
     const tickInterval = setInterval(() => {
@@ -169,7 +171,7 @@ export default function Dashboard() {
       clearInterval(pollInterval);
       clearInterval(tickInterval);
     };
-  }, [fetchData]);
+  }, []);
 
   if (error) return <ErrorState message={error} />;
   if (!data) {

@@ -1,20 +1,19 @@
 import { NextResponse } from "next/server";
-import { getUsage, getRateLimits } from "@/lib/claude-api";
+import { readFileSync } from "fs";
 
 export const dynamic = "force-dynamic";
 
+const DATA_FILE = "/tmp/claude-usage-data.json";
+
 export async function GET() {
   try {
-    const [usage, rateLimits] = await Promise.all([
-      getUsage(),
-      getRateLimits(),
-    ]);
-
-    return NextResponse.json({ usage, rateLimits, timestamp: new Date().toISOString() });
-  } catch (e) {
+    const raw = readFileSync(DATA_FILE, "utf-8");
+    const data = JSON.parse(raw);
+    return NextResponse.json(data);
+  } catch {
     return NextResponse.json(
-      { error: e instanceof Error ? e.message : "Failed to fetch" },
-      { status: 500 }
+      { error: "No data yet — is the fetcher running? (npm run dev starts it automatically)" },
+      { status: 503 }
     );
   }
 }

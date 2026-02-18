@@ -4,14 +4,17 @@
   "private": true,
   "scripts": {
     "predev": "node scripts/refresh-cookie.mjs",
-    "dev": "next dev -p 10420",
+    "dev": "concurrently -n fetcher,next -c blue,green \"node scripts/fetcher.mjs\" \"next dev -p 10420\"",
     "build": "next build",
     "start": "next start -p 10420",
-    "refresh-cookie": "node scripts/refresh-cookie.mjs"
+    "refresh-cookie": "node scripts/refresh-cookie.mjs",
+    "fetcher": "node scripts/fetcher.mjs"
   },
   "dependencies": {
+    "concurrently": "^9.2.1",
     "dotenv": "^16.4.7",
     "next": "^15.1.0",
+    "playwright": "^1.58.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
