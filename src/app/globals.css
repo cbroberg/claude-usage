@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+@theme {
+  --color-claude-bg: #2b2a27;
+  --color-claude-surface: #393835;
+  --color-claude-surface-hover: #45443f;
+  --color-claude-border: #4a4945;
+  --color-claude-text: #e8e4dc;
+  --color-claude-text-muted: #9b9788;
+  --color-claude-text-dim: #6b6760;
+  --color-claude-accent: #d4a574;
+  --color-claude-accent-dim: #b8956a;
+  --color-claude-blue: #6ba3d6;
+  --color-claude-blue-dim: #4a7fb3;
+  --color-claude-green: #7bc47f;
+  --color-claude-yellow: #d4b86a;
+  --color-claude-red: #d47474;
+  --color-claude-sidebar: #232220;
+  
+  --font-display: "Styrene A", "Sohne", system-ui, sans-serif;
+  --font-body: "Söhne", system-ui, -apple-system, sans-serif;
+  --font-mono: "Söhne Mono", "Fira Code", monospace;
+}
+
+body {
+  background-color: var(--color-claude-bg);
+  color: var(--color-claude-text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Progress bar animation */
+@keyframes progressFill {
+  from { width: 0%; }
+}
+
+.progress-animate {
+  animation: progressFill 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  opacity: 0;
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}
