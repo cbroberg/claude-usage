@@ -146,16 +146,17 @@ export default function Dashboard() {
       const res = await fetch("/api/usage");
       const json = await res.json();
       if (json.error) {
-        setError(json.error);
+        // Only show error if we have no data yet; otherwise keep stale data
+        if (!data) setError(json.error);
       } else {
         setData(json);
         setError(null);
         setLastUpdated(new Date());
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to fetch");
+      if (!data) setError(e instanceof Error ? e.message : "Failed to fetch");
     }
-  }, []);
+  }, [data]);
 
   useEffect(() => {
     fetchData();
